@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'api_service.dart';
+import 'Home.dart';
 
 void main() {
   runApp(WishlistApp());
@@ -53,6 +54,15 @@ class _WishlistScreenState extends State<WishlistScreen> {
     }
   }
 
+  void updateItem(Map<String, dynamic> updatedItem) async {
+    try {
+      await ApiService.updateItem(updatedItem['_id'], updatedItem);
+      fetchItems();
+    } catch (e) {
+      print('Failed to update item: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -76,6 +86,18 @@ class _WishlistScreenState extends State<WishlistScreen> {
                 }
               },
             ),
+            onTap: () async {
+              final updatedItem = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EditItemScreen(item: items[index]),
+                ),
+              );
+
+              if (updatedItem != null) {
+                updateItem(updatedItem);
+              }
+            },
           );
         },
       ),
@@ -95,56 +117,3 @@ class _WishlistScreenState extends State<WishlistScreen> {
     );
   }
 }
-
-class AddItemScreen extends StatefulWidget {
-  @override
-  _AddItemScreenState createState() => _AddItemScreenState();
-}
-
-class _AddItemScreenState extends State<AddItemScreen> {
-  final _nameController = TextEditingController();
-  final _descriptionController = TextEditingController();
-  final _urlController = TextEditingController();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Add Wishlist Item'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _nameController,
-              decoration: InputDecoration(labelText: 'Name'),
-            ),
-            TextField(
-              controller: _descriptionController,
-              decoration: InputDecoration(labelText: 'Description'),
-            ),
-            TextField(
-              controller: _urlController,
-              decoration: InputDecoration(labelText: 'URL'),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                final newItem = {
-                  'name': _nameController.text,
-                  'description': _descriptionController.text,
-                  'url': _urlController.text,
-                };
-
-                Navigator.pop(context, newItem);
-              },
-              child: Text('Add Item'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
