@@ -24,7 +24,7 @@ class ApiService {
     }
   }
 
-  static Future<void> updateItem(String id, Map<String, String> item) async {
+  static Future<void> updateItem(String id, Map<String, dynamic> item) async {
     final response = await http.put(
       Uri.parse('$apiUrl/$id'),
       headers: {'Content-Type': 'application/json'},
